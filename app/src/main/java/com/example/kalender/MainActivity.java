@@ -1,104 +1,67 @@
 package com.example.kalender;
 
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
+import android.widget.CalendarView;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.example.kalender.adapter.CalendarAdapter;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import com.example.kalender.helper.DatabaseHelper;
 
-public class MainActivity extends AppCompatActivity implements CalendarAdapter.OnItemListener
-{
-    private TextView monthYearText;
-    private RecyclerView calendarRecyclerView;
-    private LocalDate selectedDate;
+public class MainActivity extends AppCompatActivity {
+
+    private DatabaseHelper databaseHelper;
+    private CalendarView calendarView;
+    private ListView eventListView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initWidgets();
-        selectedDate = LocalDate.now();
-        setMonthView();
+
+        databaseHelper = new DatabaseHelper(this);
+        calendarView = findViewById(R.id.calendarView);
+        eventListView = findViewById(R.id.eventListView);
+
+        // Set listener untuk CalendarView
+        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            String selectedDate = year + "-" + (month + 1) + "-" + dayOfMonth;
+            displayEvents(selectedDate);
+        });
+
+        // Set awal untuk menampilkan event pada tanggal hari ini
+        displayEvents(getTodayDate());
     }
 
-    private void initWidgets()
-    {
-        calendarRecyclerView = findViewById(R.id.calendarRecyclerView);
-        monthYearText = findViewById(R.id.monthYearTV);
-    }
+    // Metode untuk mendapatkan semua event pada tanggal tertentu
+    private void displayEvents(String date) {
+        Cursor cursor = databaseHelper.getEventsByDate(date);
 
-    private void setMonthView()
-    {
-        monthYearText.setText(monthYearFromDate(selectedDate));
-        ArrayList<String> daysInMonth = daysInMonthArray(selectedDate);
+        // Gunakan SimpleCursorAdapter untuk menampilkan data di ListView
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+                this,
+                android.R.layout.simple_list_item_1,
+                cursor,
+                new String[]{DatabaseHelper.COLUMN_DESCRIPTION},
+                new int[]{android.R.id.text1},
+                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER); // Perlu menambahkan flag ini
 
-        CalendarAdapter calendarAdapter = new CalendarAdapter(daysInMonth, this);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 7);
-        calendarRecyclerView.setLayoutManager(layoutManager);
-        calendarRecyclerView.setAdapter(calendarAdapter);
-    }
+        eventListView.setAdapter(adapter);
 
-    private ArrayList<String> daysInMonthArray(LocalDate date)
-    {
-        ArrayList<String> daysInMonthArray = new ArrayList<>();
-        YearMonth yearMonth = YearMonth.from(date);
-
-        int daysInMonth = yearMonth.lengthOfMonth();
-
-        LocalDate firstOfMonth = selectedDate.withDayOfMonth(1);
-        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
-
-        for(int i = 1; i <= 42; i++)
-        {
-            if(i <= dayOfWeek || i > daysInMonth + dayOfWeek)
-            {
-                daysInMonthArray.add("");
-            }
-            else
-            {
-                daysInMonthArray.add(String.valueOf(i - dayOfWeek));
-            }
+        // Tampilkan pesan jika tidak ada event pada tanggal tertentu
+        if (cursor.getCount() == 0) {
+            Toast.makeText(this, "Tidak ada event pada tanggal ini", Toast.LENGTH_SHORT).show();
         }
-        return  daysInMonthArray;
     }
 
-    private String monthYearFromDate(LocalDate date)
-    {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
-        return date.format(formatter);
-    }
-
-    public void previousMonthAction(View view)
-    {
-        selectedDate = selectedDate.minusMonths(1);
-        setMonthView();
-    }
-
-    public void nextMonthAction(View view)
-    {
-        selectedDate = selectedDate.plusMonths(1);
-        setMonthView();
-    }
-
-    @Override
-    public void onItemClick(int position, String dayText)
-    {
-        if(!dayText.equals(""))
-        {
-            String message = "Selected Date " + dayText + " " + monthYearFromDate(selectedDate);
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        }
+    private String getTodayDate() {
+        // Mendapatkan tanggal hari ini dalam format "YYYY-MM-DD"
+        // Misal: 2023-12-05
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(new java.util.Date());
     }
 }

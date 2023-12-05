@@ -7,23 +7,29 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kalender.R;
-import com.example.kalender.adapter.CalendarAdapter;
 
-public class CalendarViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
-{
-    public final TextView dayOfMonth;
-    private final CalendarAdapter.OnItemListener onItemListener;
-    public CalendarViewHolder(@NonNull View itemView, CalendarAdapter.OnItemListener onItemListener)
-    {
+public class CalendarViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    public TextView dayTextView;
+    public OnItemListener onItemListener;
+
+    public CalendarViewHolder(@NonNull View itemView, OnItemListener onItemListener) {
         super(itemView);
-        dayOfMonth = itemView.findViewById(R.id.cellDayText);
+        dayTextView = itemView.findViewById(R.id.dayTextView); // Gantilah dengan ID yang sesuai
         this.onItemListener = onItemListener;
+
+        // Setel listener klik untuk item kalender
         itemView.setOnClickListener(this);
     }
 
     @Override
-    public void onClick(View view)
-    {
-        onItemListener.onItemClick(getAdapterPosition(), (String) dayOfMonth.getText());
+    public void onClick(View v) {
+        // Panggil metode onItemClick pada objek OnItemListener
+        onItemListener.onItemClick(getAdapterPosition(), dayTextView.getText().toString());
+    }
+
+    // Antarmuka untuk menangani klik pada item kalender
+    public interface OnItemListener {
+        void onItemClick(int position, String dayText);
     }
 }
