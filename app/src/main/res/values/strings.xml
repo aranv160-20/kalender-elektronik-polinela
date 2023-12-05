@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">CalendarAppExample</string>
-    <string name="back"><![CDATA[<-]]></string>
-    <string name="forward"><![CDATA[->]]></string>
+    <string name="app_name">E-Cal</string>
+    <string name="back"><![CDATA[<]]></string>
+    <string name="forward"><![CDATA[>]]></string>
+    <style name="CustomCalendarText">
+        <item name="android:textColor">#000000</item>
+    </style>
 </resources>
