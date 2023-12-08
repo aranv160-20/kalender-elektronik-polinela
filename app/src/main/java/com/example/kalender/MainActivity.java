@@ -1,8 +1,10 @@
 package com.example.kalender;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -16,10 +18,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_ADD_EVENT = 1;
+    private static final int REQUEST_ADD_EDIT_EVENT = 1;
 
     private DatabaseHelper databaseHelper;
     private CalendarView calendarView;
@@ -43,22 +46,26 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set listener untuk tombol tambah event
-        addEventButton.setOnClickListener(view -> openAddEventActivity());
+        addEventButton.setOnClickListener(view -> openAddEditEventActivity(null));
 
         // Set awal untuk menampilkan event pada tanggal hari ini
         displayEvents(getTodayDate());
     }
 
-    private void openAddEventActivity() {
+    private void openAddEditEventActivity(String eventId) {
         Intent intent = new Intent(this, AddEditEventActivity.class);
-        startActivityForResult(intent, REQUEST_ADD_EVENT);
+        intent.putExtra(AddEditEventActivity.EXTRA_DATE, getSelectedDate());
+        if (eventId != null) {
+            intent.putExtra(AddEditEventActivity.EXTRA_EVENT_ID, eventId);
+        }
+        startActivityForResult(intent, REQUEST_ADD_EDIT_EVENT);
     }
 
     // Override onActivityResult untuk menangani hasil dari AddEditEventActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ADD_EVENT && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_ADD_EDIT_EVENT && resultCode == RESULT_OK) {
             // Refresh tampilan jika event berhasil ditambahkan atau diupdate
             displayEvents(getSelectedDate());
         }

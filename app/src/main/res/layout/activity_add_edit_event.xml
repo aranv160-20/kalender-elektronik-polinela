@@ -14,19 +14,31 @@
         android:textSize="18sp"
         android:layout_marginBottom="8dp"/>
 
-    <EditText
-        android:id="@+id/dateEditText"
+    <!-- Ganti EditText dengan LinearLayout yang berisi DatePicker -->
+    <LinearLayout
+        android:id="@+id/datePickerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/dateLabel"
-        android:inputType="date"
-        android:layout_marginBottom="16dp"/>
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <DatePicker
+            android:id="@+id/datePicker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:calendarViewShown="false"
+            android:datePickerMode="spinner"
+            android:spinnersShown="true"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/descriptionLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dateEditText"
+        android:layout_below="@id/datePickerContainer"
         android:layout_marginTop="16dp"
         android:text="Description:"
         android:textSize="18sp"/>
