@@ -1,3 +1,4 @@
+// DatabaseHelper.java
 package com.example.kalender.helper;
 
 import android.content.ContentValues;
@@ -11,7 +12,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "calendar_db";
     private static final int DATABASE_VERSION = 1;
     public static final String TABLE_EVENTS = "events";
-    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_ID = "_id"; // Ubah nama kolom menjadi "_id"
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_DESCRIPTION = "description";
 
@@ -36,7 +37,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // Metode untuk menambahkan event
     public long addEvent(String date, String description) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -49,19 +49,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return newRowId;
     }
 
-    // Metode untuk membaca semua event
     public Cursor getAllEvents() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(TABLE_EVENTS, null, null, null, null, null, null);
     }
 
-    // Metode untuk mendapatkan semua event pada tanggal tertentu
     public Cursor getEventsByDate(String date) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] projection = {
                 COLUMN_ID,
                 COLUMN_DATE,
-                COLUMN_DESCRIPTION
+                COLUMN_DESCRIPTION,
+                "_id" // Include _id column
         };
         String selection = COLUMN_DATE + " = ?";
         String[] selectionArgs = {date};
@@ -77,7 +76,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
-    // Metode untuk mengupdate event
     public int updateEvent(long eventId, String date, String description) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -88,14 +86,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(eventId)});
     }
 
-    // Metode untuk menghapus event
     public int deleteEvent(long eventId) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TABLE_EVENTS, COLUMN_ID + " = ?",
                 new String[]{String.valueOf(eventId)});
     }
 
-    // Metode untuk memeriksa apakah ada event pada tanggal tertentu
     public boolean eventExists(String date) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_EVENTS, null, COLUMN_DATE + " = ?", new String[]{date}, null, null, null);

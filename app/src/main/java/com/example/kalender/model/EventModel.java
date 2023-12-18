@@ -1,18 +1,18 @@
 package com.example.kalender.model;
 
 public class EventModel {
-    private long id;
+    private long _id; // Sesuaikan dengan perubahan ID
     private String date;
     private String description;
 
-    public EventModel(long id, String date, String description) {
-        this.id = id;
+    public EventModel(long _id, String date, String description) {
+        this._id = _id;
         this.date = date;
         this.description = description;
     }
 
     public long getId() {
-        return id;
+        return _id;
     }
 
     public String getDate() {
